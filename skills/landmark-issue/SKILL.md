@@ -55,7 +55,7 @@ Body format:
 ...
 ```
 
-If `gh` fails for auth or permission reasons, **stop** and offer two alternatives: fix auth and retry, or switch this repo to `issue_tracker: file` (edit the settings block, tell the user, then continue below).
+If `gh` fails for auth or permission reasons, **stop** and offer two alternatives: fix auth and retry, or switch this repo to `issue_tracker: file` (edit the settings block, tell the user, then continue below). Use `gh` for every GitHub operation; never fall back to `curl`, raw API calls, or browser steps.
 
 **`issue_tracker: file`**
 

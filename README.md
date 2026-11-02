@@ -72,7 +72,7 @@ The full specification is in [docs/process.md](docs/process.md).
 These are the non-negotiables the skills enforce:
 
 - **Everything is versioned.** `main` is production. `dev` is integration. Work happens on `feature/`, `fix/`, `chore/`, or `docs/` branches off `dev`. PRs target `dev`. `dev → main` is a human decision.
-- **Every unit of work has an issue.** GitHub Issues when there is a GitHub remote and `gh` is authenticated; `docs/ISSUES.md` otherwise. Decided once at init.
+- **Every unit of work has an issue.** GitHub Issues when there is a GitHub remote; `docs/ISSUES.md` otherwise. If a remote exists, all GitHub work goes through the `gh` CLI, and `landmark-init` tests `gh` access (install, auth, repository) up front and stops if it fails. Decided once at init.
 - **Decisions are made in planning,** not discovered during implementation. If implementation reveals the plan is wrong, the plan is amended first.
 - **The agent stops when a tool is missing.** It names what is missing and the documented alternative. It does not improvise a workaround without explicit approval.
 - **State lives in the repository** (`docs/`), never in the harness.

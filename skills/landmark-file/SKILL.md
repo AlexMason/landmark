@@ -69,7 +69,7 @@ The `filed` state must travel with the branch into the integration branch, so it
 3. `gh pr create --base <integration_branch> --title "<type>: <title> (#<n>)" --body-file <tmp>`.
 4. Write the PR URL into the plan's `pr:` field. Commit `docs: #<n> PR link`. Push.
 
-If `gh` fails (missing, unauthenticated, no permission), **stop** and offer: fix auth and retry, or leave the branch pushed and give the user the compare URL (`https://github.com/<org>/<repo>/compare/<integration_branch>...<branch>`) to open the PR themselves; in that case ask for the URL back and record it.
+If `gh` fails (missing, unauthenticated, no permission), **stop** and offer: fix auth and retry, or leave the branch pushed and give the user the compare URL (`https://github.com/<org>/<repo>/compare/<integration_branch>...<branch>`) to open the PR themselves; in that case ask for the URL back and record it. Do not substitute `curl`, raw API calls, or browser automation for `gh`.
 
 **`issue_tracker: file`**
 

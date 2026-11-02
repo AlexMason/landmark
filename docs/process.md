@@ -73,7 +73,9 @@ landmark:
   manual_test_url: ""           # optional, e.g. http://localhost:3000
 ```
 
-`issue_tracker` is `github` only when a GitHub remote exists **and** `gh` is authenticated at init time; otherwise `file`. Downstream skills key on this value and never re-detect.
+**GitHub access.** When the repository has a GitHub remote, `gh` is the interface to it: issues, labels, comments, and PRs all go through `gh`, never raw API calls, `curl`, or browser steps. `landmark-init` therefore tests access whenever a remote exists: `gh auth status` for the remote's host, then `gh repo view` for the remote's repository. If either fails, init stops and offers the alternatives: fix it (install `gh`, authenticate, or create the remote repository) and retry, or explicitly choose `issue_tracker: file` with the user's approval. Init never falls back to `file` silently.
+
+`issue_tracker` is `github` when the remote exists and that test passes; it is `file` when there is no remote, or the remote is not on GitHub. Downstream skills key on this value and never re-detect.
 
 ### Committing to the integration branch from elsewhere
 
@@ -194,13 +196,13 @@ Next ID: 3
 
 ## 4. Capability requirements by phase
 
-| Phase     | Required                        | Optional (with documented fallback)                              |
-| --------- | ------------------------------- | ---------------------------------------------------------------- |
-| init      | `git`                           | `gh` (else `issue_tracker: file`)                                |
-| issue     | `git`                           | `gh` (keyed on `issue_tracker`)                                  |
-| plan      | `git`, read access to codebase  | sub-agents for research; structured questions                    |
-| implement | `git`                           | `test_command` (else the plan's stated check); `dev_environment` |
-| review    | `git`                           | sub-agents (else alternatives in 3.4.2)                          |
-| file      | `git`                           | `test_command` (else user confirms); `gh`; `coverage_command`    |
+| Phase     | Required                                      | Optional (with documented fallback)                              |
+| --------- | --------------------------------------------- | ---------------------------------------------------------------- |
+| init      | `git`; `gh` if a GitHub remote exists         | — (no GitHub remote → `issue_tracker: file`)                     |
+| issue     | `git`; `gh` if `issue_tracker: github`        | —                                                                |
+| plan      | `git`, read access to codebase                | sub-agents for research; structured questions                    |
+| implement | `git`                                         | `test_command` (else the plan's stated check); `dev_environment` |
+| review    | `git`                                         | sub-agents (else alternatives in 3.4.2)                          |
+| file      | `git`; `gh` if `issue_tracker: github`        | `test_command` (else user confirms); `coverage_command`          |
 
 Anything required and missing is a stop. Anything optional and missing uses its fallback and says so.
