@@ -79,6 +79,12 @@ landmark:
 
 `issue_tracker` is `github` when the remote exists and that test passes; it is `file` when there is no remote, or the remote is not on GitHub. Downstream skills key on this value and never re-detect.
 
+### The process section
+
+`AGENTS.md` is the one file every harness loads at session start, so it carries the process itself, not only configuration. Below the settings block, `landmark-init` writes a `## Landmark process` section delimited by `<!-- landmark:process:begin -->` and `<!-- landmark:process:end -->` markers. It states that the process applies to every change, maps plan `status` to the next skill, and restates the non-negotiables: no code without an approved plan, the human gates, the branch and worktree rules, one commit per step, `gh` for GitHub, and stop-don't-improvise. This document is the source; the section in `skills/landmark-init/assets/AGENTS.md` must not drift from it.
+
+Landmark owns everything between the markers. Re-running init replaces it, so project instructions go outside it. Skills still read only the settings block.
+
 ### Committing to the integration branch from elsewhere
 
 Two kinds of edit go directly to the integration branch rather than through a PR: the `landmark-init` bootstrap and `docs/ISSUES.md` edits. They are tracker state, not feature work. Run the procedure in the main checkout, never inside a linked worktree (the integration branch is normally checked out in the main checkout, and a branch cannot be checked out twice). The procedure, used whenever the main checkout is not already on the integration branch:

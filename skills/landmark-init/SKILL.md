@@ -1,6 +1,6 @@
 ---
 name: landmark-init
-description: Bootstrap a repository for the Landmark process. Initializes Git if needed, ensures the production and integration branches, creates docs/plans/, and adds or updates the Landmark settings block in AGENTS.md. Idempotent; safe on existing repos. Use when the user says "init landmark", "set up landmark here", or a landmark skill reports the repo is not initialized.
+description: Bootstrap a repository for the Landmark process. Initializes Git if needed, ensures the production and integration branches, creates docs/plans/, and adds or updates the Landmark settings block and process section in AGENTS.md. Idempotent; safe on existing repos. Use when the user says "init landmark", "set up landmark here", or a landmark skill reports the repo is not initialized.
 ---
 
 # landmark-init
@@ -61,10 +61,10 @@ Derive the rest:
 **`AGENTS.md`** — read `assets/AGENTS.md` in this skill's directory, then:
 
 - no `AGENTS.md` → copy the asset in full;
-- exists without a `## Landmark settings` section → append that section only (from the heading to the end of the asset), leaving existing content untouched;
-- exists with a settings block → update only `version`.
+- exists without a `## Landmark settings` section → append from that heading to the end of the asset (the settings block and the process section), leaving existing content untouched;
+- exists with a settings block → update `version` in the block, then make sure the process section is current: if the `<!-- landmark:process:begin` and `<!-- landmark:process:end -->` markers both exist, replace everything from the begin marker through the end marker with the asset's; if neither exists, insert the asset's process section (begin marker through end marker) directly after the settings section, before the next heading or at the end of the file. Never touch anything outside the markers. Only one of the two markers present → **stop** and ask; do not guess where the section ends.
 
-Fill every key in the block from step 3. Write all keys explicitly, including `branching` and `integration_branch`; downstream skills read them literally.
+Fill every key in the settings block from step 4. Write all keys explicitly, including `branching` and `integration_branch`; downstream skills read them literally. The process section is copied verbatim; do not edit or summarize it.
 
 **`CLAUDE.md`** — if absent, create it containing exactly `@AGENTS.md`. If present without a reference to `AGENTS.md`, append the line and tell the user. Other harnesses read `AGENTS.md` directly; create nothing else harness-specific.
 
@@ -84,6 +84,7 @@ Tell the user:
 - whether Git was initialized,
 - which branches exist and which is the integration branch,
 - the settings block as written,
+- whether the `## Landmark process` section was added, replaced, or left as is,
 - what `issue_tracker` was chosen and why, including the result of the `gh` access test when a remote exists.
 
 Then offer: "Start with `landmark-issue` to capture the first unit of work?"

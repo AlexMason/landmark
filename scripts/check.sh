@@ -4,6 +4,7 @@
 #   - every skills/*/SKILL.md has frontmatter with name == directory and a description
 #   - no SKILL.md exceeds 300 lines
 #   - every file a skill references under assets/ or references/ exists
+#   - the init AGENTS.md asset has its process-section markers
 #   - no obvious personal data (email addresses) anywhere
 
 set -u
@@ -59,6 +60,10 @@ fi
 [ -f docs/process.md ] || say_fail "docs/process.md missing"
 [ -f INSTALL.md ]      || say_fail "INSTALL.md missing"
 [ -f LICENSE ]         || say_fail "LICENSE missing"
+
+asset=skills/landmark-init/assets/AGENTS.md
+[ "$(grep -c '<!-- landmark:process:begin' "$asset")" -eq 1 ] && [ "$(grep -c '<!-- landmark:process:end -->' "$asset")" -eq 1 ] \
+  || say_fail "$asset must contain exactly one process begin marker and one end marker"
 
 # --- result -----------------------------------------------------------------
 

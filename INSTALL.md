@@ -61,12 +61,12 @@ This is idempotent. It will:
 - initialize Git if needed and tell the user it did so,
 - ensure `main` and `dev` exist,
 - create `docs/plans/`,
-- create or extend `AGENTS.md` with a Landmark settings block (asking about test and dev-environment commands),
+- create or extend `AGENTS.md` with a Landmark settings block (asking about test and dev-environment commands) and a Landmark process section, which tells every future session to follow the process,
 - add a `CLAUDE.md` shim containing `@AGENTS.md` for Claude Code (other harnesses read `AGENTS.md` directly).
 
 ## Updating
 
-Re-run Step 2. Then, in each repo, run `/landmark-init` again; it will update the `version` field in the settings block and leave everything else alone.
+Re-run Step 2. Then, in each repo, run `/landmark-init` again; it will update the `version` field in the settings block and refresh the Landmark process section between its markers, leaving everything else alone.
 
 ## Report back
 

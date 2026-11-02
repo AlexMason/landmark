@@ -28,7 +28,7 @@ Works for any harness that reads the Agent Skills format. Manual install paths a
 /landmark-init
 ```
 
-Sets up `main` + `dev`, `docs/plans/`, and an `AGENTS.md` with a Landmark settings block. Safe to run on an existing repo; it appends rather than overwrites.
+Sets up `main` + `dev`, `docs/plans/`, and an `AGENTS.md` with a Landmark settings block and a Landmark process section. The process section is what keeps an agent on the process in every session, even when no skill is named: no code without an approved plan, which skill runs next, the human gates. Safe to run on an existing repo; it appends rather than overwrites.
 
 **3. Do work:**
 
@@ -81,7 +81,7 @@ These are the non-negotiables the skills enforce:
 ## What Landmark puts in your repo
 
 ```
-AGENTS.md            project instructions + Landmark settings block
+AGENTS.md            project instructions + Landmark settings block + Landmark process section
 CLAUDE.md            one line: @AGENTS.md  (Claude Code shim; other harnesses read AGENTS.md directly)
 docs/
   plans/             YYYYMMDD-<issue>-<slug>.md, one per unit of work
@@ -118,7 +118,7 @@ Before publishing your fork, replace `alexmason` with your GitHub handle in `REA
 
 ## Versioning
 
-Tagged releases. `landmark-init` records the version it installed in the settings block so you can tell which repos are behind. To update a harness, re-run the install command.
+Tagged releases. `landmark-init` records the version it installed in the settings block so you can tell which repos are behind, and re-running it refreshes the process section. To update a harness, re-run the install command.
 
 ## License
 
