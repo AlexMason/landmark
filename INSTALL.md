@@ -21,7 +21,7 @@ Determine which harness you are running in. If you cannot tell, ask the user. Th
 ### Preferred: Skills CLI (any harness)
 
 ```sh
-npx skills add <owner>/landmark
+npx skills add alexmason/landmark
 ```
 
 This copies every skill under `skills/` into the harness's user-level skills directory. Use `-a <agent>` to target specific harnesses, e.g. `-a claude-code -a codex`. Requires Node.js; if `npx` is unavailable, use the manual path below (that is a documented alternative, not a workaround).

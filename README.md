@@ -17,7 +17,7 @@ Landmark ships in the [Agent Skills](https://agentskills.io) format (`SKILL.md`)
 **1. Install the skills into your harness** (once per machine):
 
 ```sh
-npx skills add <owner>/landmark
+npx skills add alexmason/landmark
 ```
 
 Works for any harness that reads the Agent Skills format. Manual install paths and harness notes are in [INSTALL.md](INSTALL.md). You can also just tell your agent: *"Read INSTALL.md in this repo and install Landmark."*
@@ -113,7 +113,7 @@ AGENTS.md              instructions for agents working on Landmark itself
 
 Fork it. The process is yours to change; the skills are plain markdown. Keep each skill self-contained (they are installed individually), and keep project-specific configuration in the target repo's `AGENTS.md` settings block rather than in the skills.
 
-Before publishing your fork, replace `<owner>` with your GitHub handle in `README.md`, `INSTALL.md`, and `skills/landmark-init/assets/AGENTS.md`. `./scripts/check.sh` validates the skills and flags leftover placeholders.
+Before publishing your fork, replace `alexmason` with your GitHub handle in `README.md`, `INSTALL.md`, and `skills/landmark-init/assets/AGENTS.md`. `./scripts/check.sh` validates the skills.
 
 ## Versioning
 
