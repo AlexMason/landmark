@@ -22,7 +22,7 @@ If any step cannot be completed as written, stop, say what is missing, and offer
 
 ### 1. Branch
 
-If there are uncommitted changes on the current branch, **stop** and ask the user to commit or stash them. Then:
+Run this step in the main checkout (first entry of `git worktree list`); if the current directory is a linked worktree, switch to the main checkout. If there are uncommitted changes on its current branch, **stop** and ask the user to commit or stash them. Then:
 
 ```
 git checkout <integration_branch>
@@ -30,7 +30,7 @@ git pull --ff-only          # only if the branch has an upstream; no-remote repo
 git checkout -b <type>/<n>-<slug>
 ```
 
-`<type>` from the issue; `<slug>` is a short kebab-case title. If the branch already exists, check it out instead (and pull if it has an upstream).
+`<type>` from the issue; `<slug>` is a short kebab-case title. If the branch already exists: when it has a worktree (`git worktree list --porcelain`), do the rest of this phase in that worktree; otherwise check it out (and pull if it has an upstream). Implementation later moves the branch into its own worktree; do not create one here.
 
 ### 2. Research pass 1 — the codebase as it is
 
@@ -87,7 +87,7 @@ docs: plan for #<n> — <title>
 Record the plan path on the issue:
 
 - `github`: `gh issue comment <n> --body "Plan: docs/plans/<file>"`.
-- `file`: set the issue's `Plan:` line in `docs/ISSUES.md` using the integration-branch procedure — `git stash --include-untracked` only if dirty; `git checkout <integration_branch>`; edit; commit `docs: link plan for #<n>`; push only if upstream; `git checkout -`; `git stash pop` if stashed. Do **not** change `Status:`; phase state lives in the plan's frontmatter.
+- `file`: set the issue's `Plan:` line in `docs/ISSUES.md` using the integration-branch procedure, run in the main checkout — `git stash --include-untracked` only if dirty; `git checkout <integration_branch>`; edit; commit `docs: link plan for #<n>`; push only if upstream; `git checkout -`; `git stash pop` if stashed. Do **not** change `Status:`; phase state lives in the plan's frontmatter.
 
 ### 6. Present and gate
 

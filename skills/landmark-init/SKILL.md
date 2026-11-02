@@ -15,7 +15,7 @@ If any step cannot be completed as written, stop, say exactly what is missing, a
 
 ### 1. Check tools
 
-- `git --version` must succeed. If not: **stop**. Git is required; there is no alternative.
+- `git --version` must succeed and report 2.5 or newer (Landmark implements in Git worktrees). If not: **stop**. Git with worktree support is required; there is no alternative.
 - `gh` is tested in step 3, once the remote is known.
 
 ### 2. Ensure a repository

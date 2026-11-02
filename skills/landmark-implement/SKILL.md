@@ -1,6 +1,6 @@
 ---
 name: landmark-implement
-description: Execute an approved Landmark plan step by step — one commit per step, plan checkboxes ticked as you go, deviations agreed before proceeding. Use when the user says "implement", "build it", "start the plan", or a plan has status approved or implementing.
+description: Execute an approved Landmark plan step by step in a dedicated Git worktree — one commit per step, plan checkboxes ticked as you go, deviations agreed before proceeding. Use when the user says "implement", "build it", "start the plan", or a plan has status approved or implementing.
 ---
 
 # landmark-implement
@@ -15,7 +15,11 @@ Work the plan. Do not redesign it.
    - `approved` → fresh start.
    - `implementing` → resume at the first unchecked step.
    - anything else → **stop** and explain what phase the plan is in.
-4. `git checkout <branch>` from the plan's frontmatter. If it does not exist locally, `git fetch` and try again; if still missing, **stop**. If there are uncommitted changes, **stop** and ask.
+4. Get the branch's worktree. `<branch>` is from the plan's frontmatter; `<path>` is `../<repo>.worktrees/<branch with / replaced by ->`, a sibling of the main checkout (`<repo>` is its directory name).
+   - `git worktree list --porcelain` already lists `<branch>` → use that worktree.
+   - Otherwise: if `<branch>` does not exist locally, `git fetch` and try again; if still missing, **stop**. If the main checkout (first entry of `git worktree list`) has `<branch>` checked out, **stop** and ask when it has uncommitted changes; otherwise `git checkout <integration_branch>` there, because a branch can be checked out in only one place. Then `git worktree add <path> <branch>`.
+   - If `git worktree` is unavailable (Git older than 2.5), **stop**; upgrade Git. There is no alternative.
+5. Do all remaining work in the worktree: run every command with it as the working directory, never in the main checkout. If the worktree has uncommitted changes, **stop** and ask. A fresh worktree contains only tracked files; if tests or `dev_environment` fail because untracked files (dependencies, `.env`) are missing, **stop** and ask how to provision them.
 
 ## Rule
 
@@ -69,5 +73,5 @@ When every step is ticked:
 
 1. Run the full `test_command` (or the plan's stated check). If it fails, fix on the branch (commit as `fix: ... (#<n>)`) before proceeding.
 2. Set `status: implemented`. Commit: `docs: #<n> implemented`.
-3. Report: what changed (by step), test results, manual-test steps.
-4. Do **not** open a PR. Offer: "Run `landmark-review`?"
+3. Report: the worktree path, what changed (by step), test results, manual-test steps.
+4. Do **not** open a PR. Do **not** remove the worktree; review and filing use it. Offer: "Run `landmark-review`?"

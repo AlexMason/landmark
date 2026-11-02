@@ -29,6 +29,8 @@ Shell commands in this document and in the skills are illustrative POSIX. Where 
 
 **Syncing.** "Sync the integration branch" means: `git checkout <integration_branch>`, then `git pull --ff-only` **only if the branch has an upstream**. Repos with no remote skip the pull. Before starting any new unit of work, sync the integration branch.
 
+**Worktrees.** Implementation, review, and filing happen in a dedicated Git worktree for the branch, not by switching the branch of the main checkout. `landmark-implement` creates it at `../<repo>.worktrees/<type>-<n>-<slug>`, a sibling of the main checkout and never inside it (`<repo>` is the main checkout's directory name). The main checkout is the first entry of `git worktree list`; planning, issue-tracker edits, and merges run there. Git is the record of where a worktree is (`git worktree list --porcelain`); no path is stored in the plan. A branch can be checked out in only one place, so when creating the worktree for a branch that the main checkout currently has checked out (planning leaves it there), the main checkout is first returned to the integration branch; if it has uncommitted changes, stop and ask. A fresh worktree contains only tracked files: if tests or `dev_environment` fail for missing untracked files (dependencies, `.env`), stop and ask how to provision them. The worktree is removed when the branch is merged. Worktrees need Git 2.5 or newer; if unavailable, stop — there is no alternative.
+
 ### Commits
 
 One commit per plan step. Subject format:
@@ -79,7 +81,7 @@ landmark:
 
 ### Committing to the integration branch from elsewhere
 
-Two kinds of edit go directly to the integration branch rather than through a PR: the `landmark-init` bootstrap and `docs/ISSUES.md` edits. They are tracker state, not feature work. The procedure, used whenever the agent is not already on the integration branch:
+Two kinds of edit go directly to the integration branch rather than through a PR: the `landmark-init` bootstrap and `docs/ISSUES.md` edits. They are tracker state, not feature work. Run the procedure in the main checkout, never inside a linked worktree (the integration branch is normally checked out in the main checkout, and a branch cannot be checked out twice). The procedure, used whenever the main checkout is not already on the integration branch:
 
 ```
 git stash --include-untracked        # only if the working tree is dirty
@@ -158,7 +160,7 @@ Next ID: 3
 
 **Purpose:** execute the plan, one commit per step.
 
-1. Require `status: approved` (or `implementing` to resume). Check out the branch from frontmatter.
+1. Require `status: approved` (or `implementing` to resume). Work in the branch's worktree: use the existing one, or create it (see Worktrees in section 1).
 2. Set `status: implementing`.
 3. For each unchecked to-do, in order: implement; run relevant tests (or the plan's stated check when `test_command` is empty); tick the box in the plan; commit code + plan together with the step-numbered subject.
 4. **Deviation rule.** If a step cannot be done as planned, stop. Propose the amendment, update the plan's "Implementation notes" and affected sections, get agreement, then continue. Never silently diverge.
@@ -169,7 +171,7 @@ Next ID: 3
 
 **Purpose:** independent eyes on the diff before it leaves the branch.
 
-1. Require `status: implemented` (or `in-review` to resume). Set `status: in-review`.
+1. Require `status: implemented` (or `in-review` to resume). Work in the branch's worktree. Set `status: in-review`.
 2. **Capability check.** Determine whether the harness can spawn fresh-context sub-agents, and record the chosen mode in the plan's "Review" section before dispatching anything, so a resumed session knows what was started.
    - Sub-agents available → spawn three reviewers, one per lens, each given only: the plan path, the branch, the base branch, and its lens prompt.
    - Not available → stop and offer the documented alternatives: (a) run each lens prompt through the harness's non-interactive mode from the shell, if it has one; (b) write the prompts to `docs/reviews/<plan-basename>.md` and have the user run each in a fresh session and paste results back; (c) a same-context self-review, labeled lower-confidence, only if the user explicitly accepts it.
@@ -186,13 +188,13 @@ Next ID: 3
 
 **Purpose:** prove it and open the PR.
 
-1. Require `status: reviewed` (user may override; note the override in the plan).
+1. Require `status: reviewed` (user may override; note the override in the plan). Work in the branch's worktree.
 2. Run `test_command` and `coverage_command`. Any failure is a stop. Empty `test_command` requires the user's explicit confirmation to proceed. Landmark does not enforce a coverage threshold; if the coverage tool itself fails on one, that is a failure like any other.
 3. Bring the branch up to date with the integration branch per `merge_strategy`. Conflicts are a stop-and-ask.
 4. Set `status: filed` in the plan **before** the PR or merge, so the final state travels with the branch:
    - **`issue_tracker: github`:** set `pr: ""` for now, commit, push, `gh pr create --base <integration_branch>` with a body built from the plan (goal, decisions, testing, review summary) and `Closes #<n>`. Then write the PR URL into `pr:`, commit, push. Link it.
-   - **`issue_tracker: file`:** set `pr: local`, commit. The "PR" is a chat message: summary, commit list, diff stat, test results. Wait for the user to accept. On accept, merge into the integration branch using `merge_strategy`, mark the issue `done` under Closed in `docs/ISSUES.md`, commit, and push if there is an upstream.
-5. Merge a GitHub PR only if the user asks. Help create the integration → production PR only if the user asks; never open it unprompted.
+   - **`issue_tracker: file`:** set `pr: local`, commit. The "PR" is a chat message: summary, commit list, diff stat, test results. Wait for the user to accept. On accept, in the main checkout, merge into the integration branch using `merge_strategy`, mark the issue `done` under Closed in `docs/ISSUES.md`, commit, and push if there is an upstream.
+5. Merge a GitHub PR only if the user asks; before `gh pr merge`, remove the branch's worktree and run it from the main checkout. After any merge, including the local one above, remove the worktree if it still exists (`git worktree remove`; stop if it has uncommitted changes), then offer to delete the local branch. Help create the integration → production PR only if the user asks; never open it unprompted.
 
 ## 4. Capability requirements by phase
 
@@ -201,8 +203,8 @@ Next ID: 3
 | init      | `git`; `gh` if a GitHub remote exists         | — (no GitHub remote → `issue_tracker: file`)                     |
 | issue     | `git`; `gh` if `issue_tracker: github`        | —                                                                |
 | plan      | `git`, read access to codebase                | sub-agents for research; structured questions                    |
-| implement | `git`                                         | `test_command` (else the plan's stated check); `dev_environment` |
-| review    | `git`                                         | sub-agents (else alternatives in 3.4.2)                          |
+| implement | `git` (worktrees)                             | `test_command` (else the plan's stated check); `dev_environment` |
+| review    | `git` (worktrees)                             | sub-agents (else alternatives in 3.4.2)                          |
 | file      | `git`; `gh` if `issue_tracker: github`        | `test_command` (else user confirms); `coverage_command`          |
 
 Anything required and missing is a stop. Anything optional and missing uses its fallback and says so.

@@ -12,7 +12,7 @@ Prove it, then open the PR. The integration → production merge is never this s
 1. Read the `## Landmark settings` block in `AGENTS.md`. If absent, **stop** and suggest `landmark-init`. Note `issue_tracker`, `integration_branch`, `default_branch`, `merge_strategy`.
 2. Locate the plan (named, or the single plan with `status: reviewed`; ask if several; **stop** if none).
 3. Validate `status`: `reviewed` → proceed. Anything else → **stop** and explain. The user may override ("file it anyway"); if so, add `Filed without review sign-off at user's request` under the plan's **Review** section before continuing.
-4. `git checkout <branch>`. If the working tree is dirty, **stop** and ask.
+4. Work in the branch's worktree: find it with `git worktree list --porcelain`. If there is none, create it at `../<repo>.worktrees/<branch with / replaced by ->` with `git worktree add` (`<repo>` is the main checkout's directory name; if the main checkout has the branch checked out, **stop** and ask when it is dirty, otherwise `git checkout <integration_branch>` there first). Run every command from the worktree. If it has uncommitted changes, **stop** and ask.
 
 ## Rule
 
@@ -75,7 +75,7 @@ If `gh` fails (missing, unauthenticated, no permission), **stop** and offer: fix
 
 1. Set `status: filed` and `pr: local`. Commit `docs: #<n> filed`.
 2. The "PR" is a message to the user: the title, the body above, `git log <integration_branch>..<branch> --oneline`, `git diff <integration_branch>...<branch> --stat`, and the test results. Ask: **accept** or **changes requested**.
-3. On **accept**: `git checkout <integration_branch>`; merge per `merge_strategy` (`git merge --squash <branch>` + commit with the PR title | `git merge --no-ff <branch>` | `git rebase` already done → `git merge --ff-only <branch>`). Then move the issue from **Open** to **Closed** in `docs/ISSUES.md` with `Status: done`; commit `docs: close issue #<n>`. Push only if the branch has an upstream.
+3. On **accept**, in the main checkout (first entry of `git worktree list`): `git checkout <integration_branch>`; merge per `merge_strategy` (`git merge --squash <branch>` + commit with the PR title | `git merge --no-ff <branch>` | `git rebase` already done → `git merge --ff-only <branch>`). Then move the issue from **Open** to **Closed** in `docs/ISSUES.md` with `Status: done`; commit `docs: close issue #<n>`. Push only if the branch has an upstream.
 4. On **changes requested**: set `status` back to `implemented` or `in-review` as appropriate, commit, and hand off to `landmark-implement` or `landmark-review`.
 
 ### 4. Report and stop
@@ -84,6 +84,6 @@ Tell the user: PR link (or merge result), test and coverage results, anything sk
 
 Then:
 
-- Merge a GitHub PR **only if the user asks**: `gh pr merge --<merge_strategy> --delete-branch`.
+- Merge a GitHub PR **only if the user asks**. First remove the branch's worktree (`git worktree remove <path>`; **stop** and ask if it has uncommitted changes; the branch is already pushed), then run `gh pr merge --<merge_strategy> --delete-branch` from the main checkout.
 - Help create the `<integration_branch>` → `<default_branch>` PR **only if the user asks**. Never open it on your own initiative; that merge is a human decision.
-- After any merge, offer to delete the local feature branch.
+- After any merge, remove the branch's worktree if it still exists (`git worktree remove <path>`; **stop** and ask if it has uncommitted changes), then offer to delete the local feature branch.

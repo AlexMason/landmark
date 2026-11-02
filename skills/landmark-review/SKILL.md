@@ -12,7 +12,7 @@ Independent eyes on the diff before it leaves the branch. The reviewers must not
 1. Read the `## Landmark settings` block in `AGENTS.md`. If absent, **stop** and suggest `landmark-init`.
 2. Locate the plan (named by the user, or the single plan with `status: implemented` or `in-review`; ask if several; **stop** if none).
 3. Validate `status`: `implemented` → fresh review; `in-review` → read the plan's **Review** section, which records the mode chosen and how far it got, and resume there (if the section is empty, start at step 2); anything else → **stop** and explain.
-4. `git checkout <branch>`. If the working tree is dirty, **stop** and ask the user to commit or stash.
+4. Work in the branch's worktree: find it with `git worktree list --porcelain`. If there is none, create it at `../<repo>.worktrees/<branch with / replaced by ->` with `git worktree add` (`<repo>` is the main checkout's directory name; if the main checkout has the branch checked out, **stop** and ask when it is dirty, otherwise `git checkout <integration_branch>` there first). Run every command from the worktree. If it has uncommitted changes, **stop** and ask the user to commit or stash.
 
 ## Rule
 

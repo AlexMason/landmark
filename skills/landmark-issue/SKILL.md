@@ -59,7 +59,7 @@ If `gh` fails for auth or permission reasons, **stop** and offer two alternative
 
 **`issue_tracker: file`**
 
-Use the integration-branch procedure so tracker edits never land on a feature branch:
+Use the integration-branch procedure so tracker edits never land on a feature branch. Run it in the main checkout (first entry of `git worktree list`), never inside a linked worktree:
 
 1. `git stash --include-untracked` **only if** the working tree is dirty. Note the branch you are on.
 2. `git checkout <integration_branch>`; `git pull --ff-only` only if it has an upstream.
