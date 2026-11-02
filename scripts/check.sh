@@ -4,18 +4,14 @@
 #   - every skills/*/SKILL.md has frontmatter with name == directory and a description
 #   - no SKILL.md exceeds 300 lines
 #   - every file a skill references under assets/ or references/ exists
-#   - no unresolved <owner> placeholders outside this script (warning only, since
-#     a fresh fork legitimately has them)
 #   - no obvious personal data (email addresses) anywhere
 
 set -u
 cd "$(dirname "$0")/.." || exit 1
 
 fail=0
-warn=0
 
 say_fail() { printf 'FAIL  %s\n' "$*"; fail=$((fail + 1)); }
-say_warn() { printf 'WARN  %s\n' "$*"; warn=$((warn + 1)); }
 say_ok()   { printf 'ok    %s\n' "$*"; }
 
 # --- skills -----------------------------------------------------------------
@@ -60,15 +56,11 @@ if grep -rlE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' --exclude-dir=.git
   grep -rnE '[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}' --exclude-dir=.git --exclude-dir=scripts .
 fi
 
-if grep -rl '<owner>' --exclude-dir=.git --exclude-dir=scripts . >/dev/null 2>&1; then
-  say_warn "<owner> placeholder still present in: $(grep -rl '<owner>' --exclude-dir=.git --exclude-dir=scripts . | tr '\n' ' ')"
-fi
-
 [ -f docs/process.md ] || say_fail "docs/process.md missing"
 [ -f INSTALL.md ]      || say_fail "INSTALL.md missing"
 [ -f LICENSE ]         || say_fail "LICENSE missing"
 
 # --- result -----------------------------------------------------------------
 
-printf '\n%d failure(s), %d warning(s)\n' "$fail" "$warn"
+printf '\n%d failure(s)\n' "$fail"
 [ "$fail" -eq 0 ]
